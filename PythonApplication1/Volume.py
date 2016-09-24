@@ -32,14 +32,14 @@ class Volume:
         self.blocksAvailability = thisDrive.read_block(0)[:127]
 
     def mkfile(self, path):
-        nodes = path.strip('\/').split('\/')
+        nodes = path.strip('/').split('/')
         lastNode = self.rootDirectory
         for node in nodes[:-1]:
             lastNode = lastNode.getChild(node)
         lastNode.addFile(nodes[-1])
 
     def mkdir(self, path):
-        nodes = path.strip('\/').split('\/')
+        nodes = path.strip('/').split('/')
         lastNode = self.rootDirectory
         for node in nodes[:-1]:
             lastNode = lastNode.getChild(node)
@@ -52,14 +52,14 @@ class Volume:
         self.blocksAvailability = self.currentDrive.read_block(0)[:127]
 
     def append(self, path, data):
-        nodes = path.strip('\/').split('\/')
+        nodes = path.strip('/').split('/')
         lastNode = self.rootDirectory
         for node in nodes:
             lastNode = lastNode.getChild(node)
         lastNode.appendData(data)
             
     def ls(self, path):
-        nodes = path.strip('\/').split('\/')
+        nodes = path.strip('/').split('/')
         lastNode = self.rootDirectory
         for node in nodes:
             if node != "":
@@ -67,7 +67,7 @@ class Volume:
         lastNode.list()
 
     def print(self, path):
-        nodes = path.strip('\/').split('\/')
+        nodes = path.strip('/').split('/')
         lastNode = self.rootDirectory
         for node in nodes:
             if node != "":
@@ -75,7 +75,7 @@ class Volume:
         lastNode.print()
 
     def delfile(self, path):
-        nodes = path.strip('\/').split('\/')
+        nodes = path.strip('/').split('/')
         lastNode = self.rootDirectory
         for node in nodes:
             if node != "":
