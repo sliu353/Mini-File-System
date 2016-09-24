@@ -1,0 +1,32 @@
+reconnect drive2
+ls /
+
+delfile /file1
+ls /
+
+mkdir /dir1
+ls /
+ls /dir1
+
+mkfile /dir1/file1
+mkfile /dir1/file2
+mkfile /dir1/file3
+mkfile /dir1/file4
+mkfile /dir1/file5
+mkfile /dir1/file6
+mkfile /dir1/file7
+mkfile /dir1/file8
+ls /dir1
+
+mkfile /dir1/file9
+mkfile /dir1/file10
+mkfile /dir1/file11
+mkfile /dir1/file12
+mkfile /dir1/file13
+mkfile /dir1/file14
+mkfile /dir1/file15
+mkfile /dir1/file16
+ls /dir1
+
+mkfile /dir1/file17
+ls /dir1

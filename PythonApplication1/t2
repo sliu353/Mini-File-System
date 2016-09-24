@@ -1,0 +1,22 @@
+format drive2
+ls /
+
+mkfile /file1
+mkfile /file2
+mkfile /file3
+mkfile /file4
+mkfile /file5
+mkfile /file6
+ls /
+
+append /file3 "I am /file3's data."
+ls /
+print /file3
+
+delfile /file3
+mkfile /file7
+ls /
+
+append /file7 "Now room for /file7."
+ls /
+print /file7
