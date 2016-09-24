@@ -82,6 +82,14 @@ class Volume:
                 lastNode = lastNode.getChild(node)
         lastNode.delete()
 
+    def deldir(self, path):
+        nodes = path.strip('/').split('/')
+        lastNode = self.rootDirectory
+        for node in nodes:
+            if node != "":
+                lastNode = lastNode.getChild(node)
+        lastNode.delete()
+
 class Directory:
 
     def __init__(self, drive, fileNum, parentBlockNum, parent, name):
@@ -202,6 +210,35 @@ class Directory:
                     print("Name: " + self.children.get(child).name + " Type: " + self.children.get(child).type + " Size: " + self.drive.read_block(self.children.get(child).parentBlockNum)[self.children.get(child).fileNum * FILE_INFO_SIZE + FILE_TYPE_LENGTH + FILE_NAME_LENGTH + BITMAP_SIZE : self.children.get(child).fileNum * FILE_INFO_SIZE + FILE_TYPE_LENGTH + FILE_NAME_LENGTH + BITMAP_SIZE + FILE_LENGTH ])
         else:
             print("This folder is empty")
+
+    def delete(self):
+        if len(self.children) > 0:
+            print("========== Please delete all the children first before deleting this directory! ==========")
+            return
+        global availableBlockIndices
+        global availableBlocksList
+        for index in self.blocksIndices:
+            self.drive.write_block(index, " " * BLOCK_SIZE)
+            availableBlockIndices.append(index)
+            availableBlocksList.pop(index)
+            availableBlocksList.insert(index, "-")
+        self.drive.write_block(0, (''.join(availableBlocksList) + self.drive.read_block(0)[BITMAP_SIZE:]))
+        availableBlockIndices.sort()
+        # If the parent folder is not root directory
+        parentBlockContent = self.drive.read_block(self.parentBlockNum)
+        if self.parent.parent != None:
+            parentBlockContent = parentBlockContent[:self.fileNum * FILE_INFO_SIZE] + parentBlockContent[(self.fileNum + 1) * FILE_INFO_SIZE:] + ("f:" + " " * 9 + "0000:" + "000 " * 12)
+        else:
+            parentBlockContent = parentBlockContent[:(self.fileNum) * FILE_INFO_SIZE + BITMAP_SIZE] + parentBlockContent[BITMAP_SIZE + (self.fileNum + 1) * FILE_INFO_SIZE:] + ("f:" + " " * 9 + "0000:" + "000 " * 12)    
+        self.parent.removeChild(self.fileNum)
+        if len(self.parent.children) == 0:
+            parentBlockContent = " " * BLOCK_SIZE
+            self.drive.write_block(self.parentBlockNum, " " * BLOCK_SIZE)
+            availableBlockIndices.append(self.parentBlockNum)
+            availableBlocksList.pop(self.parentBlockNum)
+            availableBlocksList.insert(self.parentBlockNum, "-")
+            self.drive.write_block(0, (''.join(availableBlocksList) + self.drive.read_block(0)[BITMAP_SIZE:]))
+        self.drive.write_block(self.parentBlockNum, parentBlockContent)
 
 class File:
     def __init__(self, drive, fileNum, parentBlockNum, parent, name):

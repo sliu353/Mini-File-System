@@ -23,3 +23,5 @@ while True:
         myVolume.append(instructionKeyWords[1], instructionKeyWords[2])
     if instructionKeyWords[0] == "delfile":
         myVolume.delfile(instructionKeyWords[1])
+    if instructionKeyWords[0] == "deldir":
+        myVolume.deldir(instructionKeyWords[1])
