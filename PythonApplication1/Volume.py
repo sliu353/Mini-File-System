@@ -213,7 +213,7 @@ class File:
         self.type = "File"
         self.blocksIndices = []
         self.size = 0
-/
+
     def appendData(self, data):
         data = data.strip("\"")
         allData = ""
