@@ -35,17 +35,23 @@ class Volume:
         self.blocksAvailability = thisDrive.read_block(0)[:127]
 
     def mkfile(self, path):
-        nodes = path.strip('/').split('/')
-        lastNode = self.rootDirectory
-        for node in nodes[:-1]:
-            lastNode = lastNode.getChild(node)
+        try:
+            nodes = path.strip('/').split('/')
+            lastNode = self.rootDirectory
+            for node in nodes[:-1]:
+                lastNode = lastNode.getChild(node)
+        except:
+            print("Um there is some problem with your input")
         lastNode.addFile(nodes[-1])
 
     def mkdir(self, path):
-        nodes = path.strip('/').split('/')
-        lastNode = self.rootDirectory
-        for node in nodes[:-1]:
-            lastNode = lastNode.getChild(node)
+        try:
+            nodes = path.strip('/').split('/')
+            lastNode = self.rootDirectory
+            for node in nodes[:-1]:
+                lastNode = lastNode.getChild(node)
+        except:
+            print("Um there is some problem with your input")
         lastNode.addDirectory(nodes[-1])
 
     def reconnect(self, name):
@@ -55,43 +61,58 @@ class Volume:
         self.blocksAvailability = self.currentDrive.read_block(0)[:127]
 
     def append(self, path, data):
-        nodes = path.strip('/').split('/')
-        lastNode = self.rootDirectory
-        for node in nodes:
-            lastNode = lastNode.getChild(node)
+        try:
+            nodes = path.strip('/').split('/')
+            lastNode = self.rootDirectory
+            for node in nodes:
+                lastNode = lastNode.getChild(node)
+        except:
+            print("Um there is some problem with your input")
         lastNode.appendData(data)
             
     def ls(self, path):
-        nodes = path.strip('/').split('/')
-        lastNode = self.rootDirectory
-        for node in nodes:
-            if node != "":
-                lastNode = lastNode.getChild(node)
-        lastNode.list()
+        try:
+            nodes = path.strip('/').split('/')
+            lastNode = self.rootDirectory
+            for node in nodes:
+                if node != "":
+                    lastNode = lastNode.getChild(node)
+            lastNode.list()
+        except:
+            print("Um there is some problem with your input")
 
     def print(self, path):
-        nodes = path.strip('/').split('/')
-        lastNode = self.rootDirectory
-        for node in nodes:
-            if node != "":
-                lastNode = lastNode.getChild(node)
-        lastNode.print()
+        try:
+            nodes = path.strip('/').split('/')
+            lastNode = self.rootDirectory
+            for node in nodes:
+                if node != "":
+                    lastNode = lastNode.getChild(node)
+            lastNode.print()
+        except:
+            print("Um there is some problem with your input")
 
     def delfile(self, path):
-        nodes = path.strip('/').split('/')
-        lastNode = self.rootDirectory
-        for node in nodes:
-            if node != "":
-                lastNode = lastNode.getChild(node)
-        lastNode.delete()
+        try:
+            nodes = path.strip('/').split('/')
+            lastNode = self.rootDirectory
+            for node in nodes:
+                if node != "":
+                    lastNode = lastNode.getChild(node)
+            lastNode.delete()
+        except:
+            print("Um there is some problem with your input")
 
     def deldir(self, path):
-        nodes = path.strip('/').split('/')
-        lastNode = self.rootDirectory
-        for node in nodes:
-            if node != "":
-                lastNode = lastNode.getChild(node)
-        lastNode.delete()
+        try:
+            nodes = path.strip('/').split('/')
+            lastNode = self.rootDirectory
+            for node in nodes:
+                if node != "":
+                    lastNode = lastNode.getChild(node)      
+            lastNode.delete()
+        except:
+            print("Um there is some problem with your input")  
 
 class Directory:
 
@@ -206,11 +227,13 @@ class Directory:
 
     def list(self):
         if len(self.children) > 0:
+            print("Name      Type       Size  Blocks")
+            print("-" * 74) 
             for child in self.children:
                 if self.parent != None:
-                    print("Name: " + self.children.get(child).name + " Type: " + self.children.get(child).type + " Size: " + self.drive.read_block(self.children.get(child).parentBlockNum)[self.children.get(child).fileNum * FILE_INFO_SIZE + FILE_TYPE_LENGTH + FILE_NAME_LENGTH : self.children.get(child).fileNum * FILE_INFO_SIZE + FILE_TYPE_LENGTH + FILE_NAME_LENGTH + FILE_LENGTH])
+                    print(self.children.get(child).name.ljust(10, " ") + self.children.get(child).type.ljust(11, " ") + self.drive.read_block(self.children.get(child).parentBlockNum)[self.children.get(child).fileNum * FILE_INFO_SIZE + FILE_TYPE_LENGTH + FILE_NAME_LENGTH : self.children.get(child).fileNum * FILE_INFO_SIZE + FILE_TYPE_LENGTH + FILE_NAME_LENGTH + FILE_LENGTH] + "  " + self.drive.read_block(self.children.get(child).parentBlockNum)[self.children.get(child).fileNum * FILE_INFO_SIZE + FILE_TYPE_LENGTH + FILE_NAME_LENGTH + 5 : (self.children.get(child).fileNum + 1) * FILE_INFO_SIZE ])
                 else:
-                    print("Name: " + self.children.get(child).name + " Type: " + self.children.get(child).type + " Size: " + self.drive.read_block(self.children.get(child).parentBlockNum)[self.children.get(child).fileNum * FILE_INFO_SIZE + FILE_TYPE_LENGTH + FILE_NAME_LENGTH + BITMAP_SIZE : self.children.get(child).fileNum * FILE_INFO_SIZE + FILE_TYPE_LENGTH + FILE_NAME_LENGTH + BITMAP_SIZE + FILE_LENGTH ])
+                    print(self.children.get(child).name.ljust(10, " ") + self.children.get(child).type.ljust(11, " ") + self.drive.read_block(self.children.get(child).parentBlockNum)[self.children.get(child).fileNum * FILE_INFO_SIZE + FILE_TYPE_LENGTH + FILE_NAME_LENGTH + BITMAP_SIZE : self.children.get(child).fileNum * FILE_INFO_SIZE + FILE_TYPE_LENGTH + FILE_NAME_LENGTH + BITMAP_SIZE + FILE_LENGTH ] + "  " + self.drive.read_block(self.children.get(child).parentBlockNum)[self.children.get(child).fileNum * FILE_INFO_SIZE + FILE_TYPE_LENGTH + FILE_NAME_LENGTH + BITMAP_SIZE + 5 : (self.children.get(child).fileNum + 1) * FILE_INFO_SIZE + BITMAP_SIZE ])
         else:
             print("This folder is empty")
 
@@ -243,9 +266,9 @@ class Directory:
             self.drive.write_block(0, (''.join(availableBlocksList) + self.drive.read_block(0)[BITMAP_SIZE:]))
             content = self.drive.read_block(self.parent.parentBlockNum)
             if self.parent.parent.parent != None:
-                content = content[:self.parent.parentBlockNum * FILE_INFO_SIZE + FILE_NAME_LENGTH + FILE_TYPE_LENGTH] + "0000:" + "000 " * 12 + content[(self.parent.parentBlockNum + 1) * FILE_INFO_SIZE:]
+                content = content[:self.parent.fileNum * FILE_INFO_SIZE + FILE_NAME_LENGTH + FILE_TYPE_LENGTH] + "0000:" + "000 " * 12 + content[(self.parent.fileNum + 1) * FILE_INFO_SIZE:]
             else:
-                content = content[:BITMAP_SIZE +  self.parent.parentBlockNum * FILE_INFO_SIZE + FILE_NAME_LENGTH + FILE_TYPE_LENGTH] + "0000:" + "000 " * 12 + content[BITMAP_SIZE + (self.parent.parentBlockNum + 1) * FILE_INFO_SIZE:]
+                content = content[:BITMAP_SIZE +  self.parent.fileNum * FILE_INFO_SIZE + FILE_NAME_LENGTH + FILE_TYPE_LENGTH] + "0000:" + "000 " * 12 + content[BITMAP_SIZE + (self.parent.fileNum + 1) * FILE_INFO_SIZE:]
             self.drive.write_block(self.parent.parentBlockNum, content)
         self.drive.write_block(self.parentBlockNum, parentBlockContent)
 
@@ -331,9 +354,9 @@ class File:
             self.drive.write_block(0, (''.join(availableBlocksList) + self.drive.read_block(0)[BITMAP_SIZE:]))
             content = self.drive.read_block(self.parent.parentBlockNum)
             if self.parent.parent.parent != None:
-                content = content[:self.parent.parentBlockNum * FILE_INFO_SIZE + FILE_NAME_LENGTH + FILE_TYPE_LENGTH] + "0000:" + "000 " * 12 + content[(self.parent.parentBlockNum + 1) * FILE_INFO_SIZE:]
+                content = content[:self.parent.fileNum * FILE_INFO_SIZE + FILE_NAME_LENGTH + FILE_TYPE_LENGTH] + "0000:" + "000 " * 12 + content[(self.parent.fileNum + 1) * FILE_INFO_SIZE:]
             else:
-                content = content[:BITMAP_SIZE +  self.parent.parentBlockNum * FILE_INFO_SIZE + FILE_NAME_LENGTH + FILE_TYPE_LENGTH] + "0000:" + "000 " * 12 + content[BITMAP_SIZE + (self.parent.parentBlockNum + 1) * FILE_INFO_SIZE:]
+                content = content[:BITMAP_SIZE +  self.fileNum * FILE_INFO_SIZE + FILE_NAME_LENGTH + FILE_TYPE_LENGTH] + "0000:" + "000 " * 12 + content[BITMAP_SIZE + (self.parent.fileNum + 1) * FILE_INFO_SIZE:]
             self.drive.write_block(self.parent.parentBlockNum, content)
         self.drive.write_block(self.parentBlockNum, parentBlockContent)
         
