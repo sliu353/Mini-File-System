@@ -241,6 +241,12 @@ class Directory:
             availableBlocksList.pop(self.parentBlockNum)
             availableBlocksList.insert(self.parentBlockNum, "-")
             self.drive.write_block(0, (''.join(availableBlocksList) + self.drive.read_block(0)[BITMAP_SIZE:]))
+            content = self.drive.read_block(self.parent.parentBlockNum)
+            if self.parent.parent.parent != None:
+                content = content[:self.parent.parentBlockNum * FILE_INFO_SIZE + FILE_NAME_LENGTH + FILE_TYPE_LENGTH] + "0000:" + "000 " * 12 + content[(self.parent.parentBlockNum + 1) * FILE_INFO_SIZE:]
+            else:
+                content = content[:BITMAP_SIZE +  self.parent.parentBlockNum * FILE_INFO_SIZE + FILE_NAME_LENGTH + FILE_TYPE_LENGTH] + "0000:" + "000 " * 12 + content[BITMAP_SIZE + (self.parent.parentBlockNum + 1) * FILE_INFO_SIZE:]
+            self.drive.write_block(self.parent.parentBlockNum, content)
         self.drive.write_block(self.parentBlockNum, parentBlockContent)
 
 class File:
@@ -316,7 +322,7 @@ class File:
         else:
             parentBlockContent = parentBlockContent[:(self.fileNum) * FILE_INFO_SIZE + BITMAP_SIZE] + parentBlockContent[BITMAP_SIZE + (self.fileNum + 1) * FILE_INFO_SIZE:] + ("f:" + " " * 9 + "0000:" + "000 " * 12)    
         self.parent.removeChild(self.fileNum)
-        if len(self.parent.children) == 0:
+        if len(self.parent.children) == 0 and self.parent.parent != None:
             parentBlockContent = " " * BLOCK_SIZE
             self.drive.write_block(self.parentBlockNum, " " * BLOCK_SIZE)
             availableBlockIndices.append(self.parentBlockNum)
@@ -324,5 +330,10 @@ class File:
             availableBlocksList.insert(self.parentBlockNum, "-")
             self.drive.write_block(0, (''.join(availableBlocksList) + self.drive.read_block(0)[BITMAP_SIZE:]))
             content = self.drive.read_block(self.parent.parentBlockNum)
+            if self.parent.parent.parent != None:
+                content = content[:self.parent.parentBlockNum * FILE_INFO_SIZE + FILE_NAME_LENGTH + FILE_TYPE_LENGTH] + "0000:" + "000 " * 12 + content[(self.parent.parentBlockNum + 1) * FILE_INFO_SIZE:]
+            else:
+                content = content[:BITMAP_SIZE +  self.parent.parentBlockNum * FILE_INFO_SIZE + FILE_NAME_LENGTH + FILE_TYPE_LENGTH] + "0000:" + "000 " * 12 + content[BITMAP_SIZE + (self.parent.parentBlockNum + 1) * FILE_INFO_SIZE:]
+            self.drive.write_block(self.parent.parentBlockNum, content)
         self.drive.write_block(self.parentBlockNum, parentBlockContent)
         
