@@ -1,3 +1,6 @@
+# Name: Liu Siyuan
+# Upi: sliu353
+
 from drive import Drive
 
 availableBlockIndices = list(range(1, 128))
@@ -313,5 +316,13 @@ class File:
         else:
             parentBlockContent = parentBlockContent[:(self.fileNum) * FILE_INFO_SIZE + BITMAP_SIZE] + parentBlockContent[BITMAP_SIZE + (self.fileNum + 1) * FILE_INFO_SIZE:] + ("f:" + " " * 9 + "0000:" + "000 " * 12)    
         self.parent.removeChild(self.fileNum)
+        if len(self.parent.children) == 0:
+            parentBlockContent = " " * BLOCK_SIZE
+            self.drive.write_block(self.parentBlockNum, " " * BLOCK_SIZE)
+            availableBlockIndices.append(self.parentBlockNum)
+            availableBlocksList.pop(self.parentBlockNum)
+            availableBlocksList.insert(self.parentBlockNum, "-")
+            self.drive.write_block(0, (''.join(availableBlocksList) + self.drive.read_block(0)[BITMAP_SIZE:]))
+            content = self.drive.read_block(self.parent.parentBlockNum)
         self.drive.write_block(self.parentBlockNum, parentBlockContent)
         
