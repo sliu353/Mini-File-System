@@ -1,4 +1,4 @@
-# PythonApplication1
+# Mini File System (COMPSCI340 Assignment)
 
 This is a simple file management system coded in Python. 
 
